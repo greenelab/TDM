@@ -1,0 +1,11 @@
+Package: TDM
+Version: 0.3
+Date: 2015-07-09
+Title: TDM
+Authors: c(person("Jeffrey Ahearn Thompson",
+    "Developer",
+    email = "..."))
+Author: Jeffrey Ahearn Thompson
+Maintainer: Jeffrey Ahearn Thompson <jeffrey.a.thompson.gr@dartmouth.edu>
+Description: Training Distribution Matching: a normalization method to help compare RNA-seq data to microarrays for machine learning.
+License: BSD (3 Clause)
