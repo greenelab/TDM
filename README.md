@@ -5,6 +5,6 @@ In order to include this package in your R code, you only need to do the followi
 
 install.packages("devtools")  
 library(devtools)  
-devtools::install_github("jeffreyat/TDM")  
+devtools::install_github("greenelab/TDM")  
 library(TDM)
 vignette(TDM)
