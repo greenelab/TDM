@@ -138,7 +138,7 @@ inv_log_transform = function(data = NULL, file = NULL) {
 log_transform_p1 = function(data = NULL, file = NULL) {
 	if(is.null(data)) {
 		if(is.null(file)) {
-			stop("You must specifcy either data or file.")
+			stop("You must specify either data or file.")
 		} else {
 			data <- fread(file, header=T, data.table=T)
 		}
@@ -153,7 +153,7 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 	
 	# Convert the result back to a data.table and bind the
 	# gene symbols back on.
-	result = data.table(cbind(data[[1]], t(log_transform)))
+	result = data.table(cbind(as.character(data[[1]]), t(log_transform)))
 	setnames(result, colnames(result), colnames(data))
 	
 	return(result)
@@ -174,7 +174,12 @@ zero_to_one = function(data) {
 	if(sum(data)==0) {
 		return(as.vector(rep(0.0, length(data))))
 	}else if(min(data) == max(data)){
-		stop("All values in row are the same (and non-zero).")
+		return(as.vector(rep(0.0, length(data))))
+		if(min(data) < 1){
+			return(data)
+		} else {
+			return(as.vector(rep(0.0, length(data))))
+		}
 	}
 	
 	# Transform the values.
@@ -201,7 +206,7 @@ zero_to_one_transform = function(datatable) {
 	zo = apply(datamat,1,zero_to_one)
 	
 	# Bind on the gene symbols.
-	result = data.table(cbind(datatable[[1]], t(zo)))
+	result = data.table(data.frame(datatable[[1]], t(zo)))
 	setnames(result, colnames(result), colnames(datatable))
 	
 	return(result)
@@ -277,7 +282,11 @@ tdm <- function(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min,
 	return(result)
 
 } # end tdm
-	
+
+euc.dist = function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
+
+trim = function (x) gsub("^\\s+|\\s+$", "", x)
+
 #' TDM Transformation
 #' 
 #' The expression files should have the same sorts of gene symbols. The target file
@@ -314,10 +323,18 @@ tdm <- function(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min,
 #' @return void
 #'
 #' @export
-tdm_transform <- function(target_data=NULL, ref_data=NULL, file=NULL, ref_file=NULL, negative=FALSE, filter_p=FALSE, inv_reference = TRUE, log_target=TRUE){
-	# Load the data.table package.
-	load_it("data.table")
+tdm_transform <- function(target_data=NULL, 
+	ref_data=NULL, 
+	file=NULL, 
+	ref_file=NULL, 
+	negative=FALSE, 
+	filter_p=FALSE, 
+	inv_reference = TRUE, 
+	log_target=TRUE){
 	
+	load_it(c("data.table", "binr", "scales"))
+
+	# Preprocess the reference data.
 	if(is.null(ref_data)) {
 		# Read the first line of the reference file.
 		ref_head = readLines(ref_file, n=1)
@@ -342,7 +359,8 @@ tdm_transform <- function(target_data=NULL, ref_data=NULL, file=NULL, ref_file=N
 	} else {
 		ref_values = ref_data
 	}
-	# Get the gene symbols.
+
+    # Get the gene symbols from the reference data.
 	genes = data.frame(gene = ref_values[[1]], drop=F)
 	
 	# Inverse log, then relog reference values if asked.
@@ -352,8 +370,9 @@ tdm_transform <- function(target_data=NULL, ref_data=NULL, file=NULL, ref_file=N
 	}
 	
 	# Key the table to gene symbol.
-	setkey(ref_values, "gene")
+	#setkey(ref_values, "gene")
 
+	# Preprocess the target data.
 	if(is.null(target_data)) {
 		# Get the header of the target file.
 		exp_head = readLines(file, n=1)
@@ -377,12 +396,14 @@ tdm_transform <- function(target_data=NULL, ref_data=NULL, file=NULL, ref_file=N
 	}
 	
 	# Key the table to gene symbol.
-	setkey(expression_values, "gene")
+	#setkey(expression_values, "gene")
 	
 	# If the gene symbols come with a vertical bar and Entrez id,
 	# such as Illumina data often do, then strip that suffix.
 	expression_values$gene = gsub('^(.*)\\|.*$', '\\1', expression_values$gene)
 	
+	expression_values$gene = trim(expression_values$gene)
+
 	# Figure out which genes are in the reference file, but not
 	# in the target file.
 	missing = ref_values$gene[!(ref_values$gene %in% expression_values$gene)]
