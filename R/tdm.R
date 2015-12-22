@@ -367,6 +367,7 @@ tdm_transform <- function(target_data=NULL,
 	if(negative) {
 		ref_values = inv_log_transform(ref_values)
 		ref_values = log_transform_p1(ref_values)
+		ref_values$gene = genes$gene
 	}
 	
 	# Key the table to gene symbol.
