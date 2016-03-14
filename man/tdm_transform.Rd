@@ -6,7 +6,7 @@
 \usage{
 tdm_transform(target_data = NULL, ref_data = NULL, file = NULL,
   ref_file = NULL, negative = FALSE, filter_p = FALSE,
-  inv_reference = TRUE, log_target = TRUE)
+  inv_reference = TRUE, log_target = TRUE, tdm_factor = 1)
 }
 \arguments{
 \item{file}{-- The file of gene expression values to transform, presumably
@@ -19,15 +19,24 @@ Values should be tab-separated.}
 \item{ref_file}{-- the file to transform in relation to, presumably microarray
 expression values. Values should be tab-separated.}
 
+\item{negative}{-- should the reference file be first inverse log transformed, then
+log transformed again adding 1 to each value? Do this if the file has already
+been log transformed and their are negative numbers in it.}
+
 \item{filter_p}{-- should the patients in the target file be filtered to include
 only those that match patients (column ids) in the reference file? Only the first
 15 characters are checked for match.}
 
-\item{log_target}{-- should the target file be log transformed?}
+\item{inv_reference}{-- should reference data be inverse log transformed? Do this
+if the target is not already log transformed (which is the typical case). This just
+ensures that the comparison is meaningful.}
 
-\item{inv}{-- should the reference file be first inverse log transformed, then
-log transformed again adding 1 to each value? Do this if the file has already
-been log transformed and their are negative numbers in it.}
+\item{log_target}{-- should the target file be log transformed after TDM? Usually
+it should, since microarray data are typically log transformed and the whole
+point of the transformation is to make the data more comparable.}
+
+\item{tdm_factor}{-- a factor of the IQR, to adjust the granularity of distribution
+matching.}
 }
 \value{
 void

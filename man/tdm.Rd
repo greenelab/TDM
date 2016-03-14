@@ -5,7 +5,8 @@
 \title{TDM Transformation on a Single Value}
 \usage{
 tdm(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min, ref_max,
-  ref_third_q, ref_first_q, inv_reference = TRUE, log_target = TRUE)
+  ref_third_q, ref_first_q, inv_reference = TRUE, log_target = TRUE,
+  tdm_factor = 1)
 }
 \arguments{
 \item{value}{-- A single value from a distribution that is being
