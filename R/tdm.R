@@ -233,7 +233,7 @@ zero_to_one_transform = function(datatable) {
 #' 
 #' @return TDM of the value passed.
 #' @export
-tdm <- function(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min, ref_max, ref_third_q, ref_first_q, inv_reference=TRUE, log_target=TRUE) {
+tdm <- function(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min, ref_max, ref_third_q, ref_first_q, inv_reference=TRUE, log_target=TRUE, tdm_factor=1) {
 
 	# If the reference distribution was log transformed, then inverse log its
 	# values here. This will come out the same, because log is monotonically
@@ -247,15 +247,15 @@ tdm <- function(value, iqr, old_min, old_max, old_third_q, old_first_q, ref_min,
 	
 	# Find the number of iqrs from reference distribution that fit between
 	# it's third quartile and max.
-	topscale = (ref_max- ref_third_q)/(ref_third_q - ref_first_q)
+	topscale = (ref_max- ref_third_q) / ((ref_third_q - ref_first_q)*tdm_factor)
 	
 	# Do the same for min and first quartile.
-	bottomscale = (ref_first_q - ref_min)/(ref_third_q - ref_first_q)
+	bottomscale = (ref_first_q - ref_min) / ((ref_third_q - ref_first_q)*tdm_factor)
 	
 	# Set cutoff values that would make the target distribution have same
 	# relationship between quartiles and min and max.
-	upandout = old_third_q + topscale*iqr
-	downandout = old_first_q - bottomscale*iqr
+	upandout = old_third_q + topscale*iqr*tdm_factor
+	downandout = old_first_q - bottomscale*iqr*tdm_factor
 	
 	# The bottom threshold should not be less than the minimum already was.
 	if(downandout < old_min) {
@@ -320,6 +320,9 @@ trim = function (x) gsub("^\\s+|\\s+$", "", x)
 #' it should, since microarray data are typically log transformed and the whole
 #' point of the transformation is to make the data more comparable.
 #' 
+#' @param tdm_factor -- a factor of the IQR, to adjust the granularity of distribution
+#' matching.
+#'
 #' @return void
 #'
 #' @export
@@ -330,7 +333,8 @@ tdm_transform <- function(target_data=NULL,
 	negative=FALSE, 
 	filter_p=FALSE, 
 	inv_reference = TRUE, 
-	log_target=TRUE){
+	log_target=TRUE,
+	tdm_factor=1){
 	
 	load_it(c("data.table", "binr", "scales"))
 
@@ -467,7 +471,7 @@ tdm_transform <- function(target_data=NULL,
 	
 	# Perform TDM
 	datamat = data.matrix(expression_values[,2:ncol(expression_values),with=F])
-	tdmmat = apply(datamat,1,function(x) {sapply(x, function(y) tdm(y, iqr, old_min, old_max, old_third_q, old_first_q, ref_min, ref_max, ref_third_q, ref_first_q, inv_reference, log_target))})
+	tdmmat = apply(datamat,1,function(x) {sapply(x, function(y) tdm(y, iqr, old_min, old_max, old_third_q, old_first_q, ref_min, ref_max, ref_third_q, ref_first_q, inv_reference, log_target, tdm_factor))})
 	result = data.table(cbind(as.character(expression_values[[1]]), t(tdmmat)))
 	result[[1]] = as.factor(result[[1]])
 	setnames(result, colnames(result), colnames(expression_values))

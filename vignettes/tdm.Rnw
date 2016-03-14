@@ -18,7 +18,7 @@
 
 \title{TDM}
 \author{Jeffrey A. Thompson}
-\affil{Greene Lab, Geisel School of Medicine, Dartmouth College}
+\affil{Quantitative Biomedical Sciences Program, Geisel School of Medicine at Dartmouth College}
 \maketitle
 
 % !Rnw weave = knitr 
