@@ -10,16 +10,9 @@
 load_it = function(pack, update=FALSE) {
 	invisible(sapply(pack, function(package) {
 		if(!require(package, quietly=T, character.only=T)){
-				if(length(find("biocLite")) < 1) {
-						source("http://bioconductor.org/biocLite.R")
-				}
-				if(update) {
-						biocLite(package)	
-				} else {
-						biocLite(package, suppressUpdates=TRUE)
-				}
-
+		    if (!require("BiocManager")) install.packages("BiocManager")
+		    BiocManager::install(c(package))
 				library(package, quietly=T, character.only=T)
-			}
-		}))
+		}
+	}))
 } #end load_it
