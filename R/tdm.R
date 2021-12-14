@@ -171,7 +171,7 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 zero_to_one = function(data) {
 	# If the data are already all 0, then do nothing.
 	# If the data are all the same, then stop.
-	if(sum(data)==0) {
+	if(all(data==0)) {
 		return(as.vector(rep(0.0, length(data))))
 	}else if(min(data) == max(data)){
 		return(as.vector(rep(0.0, length(data))))
