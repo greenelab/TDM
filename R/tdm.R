@@ -484,3 +484,19 @@ tdm_transform <- function(target_data=NULL,
 	return(expression_values)
 } # end tdm_transform
 
+#' Numeric version of data.table
+#' 
+#' Ensure gene expression values are numeric in a given data.table
+#' 
+#' @param input_data: a data.table with gene in the first column and gene 
+#' expression in the remaining columns
+#' 
+#' @return a data.table with numeric values for the gene expression columns
+#'
+#' @export
+ensure_numeric_gex <- function(input_data) {
+  
+  
+  
+  return(something)
+} # ensure_numeric_gex
