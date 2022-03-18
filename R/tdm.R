@@ -511,14 +511,18 @@ ensure_numeric_gex <- function(input_data) {
   
   if ("data.table" %in% class(input_data)) {
     
+    # save gene names as character vector
     gene_names <- as.character(input_data[[1]])
+    
+    # force gene expression values to be numeric
     gex_values <- t(apply(input_data[,-1], 1, as.numeric))
     
-    return_df <- data.frame(gene_names,
-                            gex_values)
-    
+    # create data frame of gene names and gene expression values
+    # set column names to be same as input data
+    return_df <- data.frame(gene_names, gex_values)
     names(return_df) <- names(input_data)
     
+    # return as data.table
     return(data.table(return_df))
     
   } else {
