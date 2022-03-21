@@ -122,7 +122,7 @@ inv_log_transform = function(data = NULL, file = NULL) {
 	result = data.table(cbind(data[[1]], t(inv_log)))
 	setnames(result, colnames(result), colnames(data))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 } # end inv_log_transform
 
 #' Log2 Transform 1 Plus
@@ -162,7 +162,7 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 	result = data.table(cbind(as.character(data[[1]]), t(log_transform)))
 	setnames(result, colnames(result), colnames(data))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 } # end log_transform_p1
 
 #' Zero to One Transform a Vector
@@ -219,7 +219,7 @@ zero_to_one_transform = function(datatable) {
 	result = data.table(data.frame(datatable[[1]], t(zo)))
 	setnames(result, colnames(result), colnames(datatable))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 }
 
 #' TDM Transformation on a Single Value
