@@ -108,8 +108,8 @@ inv_log_transform = function(data = NULL, file = NULL) {
 		}
 	} 
 
-  # ensure gene expression values are numeric
-  data <- ensure_numeric_gex(data)
+        # ensure gene expression values are numeric
+        data <- ensure_numeric_gex(data)
   	
 	# Convert the numeric part of the data.table to a matrix.
 	# Assuming first column contains gene symbols.
@@ -119,7 +119,7 @@ inv_log_transform = function(data = NULL, file = NULL) {
 	inv_log = apply(datamat,1,inv_log)
 	
 	# Convert the result back to a data.table and bind the symbols back on.
-	result = data.table(cbind(data[[1]], t(inv_log)))
+	result = data.table(cbind(as.character(data[[1]]), t(inv_log)))
 	setnames(result, colnames(result), colnames(data))
 	
 	return(ensure_numeric_gex(result))
@@ -147,8 +147,8 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 		}
 	} 
 	
-  # ensure gene expression values are numeric
-  data <- ensure_numeric_gex(data)
+        # ensure gene expression values are numeric
+        data <- ensure_numeric_gex(data)
   
 	# Convert the numeric part of the data.table to a matrix.
 	# Assuming first column contains gene symbols.
@@ -206,8 +206,8 @@ zero_to_one = function(data) {
 #' @export
 zero_to_one_transform = function(datatable) {
   
-  # ensure gene expression values are numeric
-  datatable <- ensure_numeric_gex(datatable)
+        # ensure gene expression values are numeric
+        datatable <- ensure_numeric_gex(datatable)
   
 	# Convert the data to a matrix.
 	datamat = data.matrix(datatable[,2:ncol(datatable),with=F])
@@ -216,7 +216,7 @@ zero_to_one_transform = function(datatable) {
 	zo = apply(datamat,1,zero_to_one)
 	
 	# Bind on the gene symbols.
-	result = data.table(data.frame(datatable[[1]], t(zo)))
+	result = data.table(data.frame(as.character(datatable[[1]]), t(zo)))
 	setnames(result, colnames(result), colnames(datatable))
 	
 	return(ensure_numeric_gex(result))
@@ -374,7 +374,7 @@ tdm_transform <- function(target_data=NULL,
 		ref_values = ref_data
 	}
 
-    # Get the gene symbols from the reference data.
+        # Get the gene symbols from the reference data.
 	genes = data.frame(gene = ref_values[[1]], drop=F)
 	
 	# Inverse log, then relog reference values if asked.
