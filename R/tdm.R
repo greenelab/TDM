@@ -107,7 +107,10 @@ inv_log_transform = function(data = NULL, file = NULL) {
 			data <- fread(file, header=T, data.table=T)
 		}
 	} 
-	
+
+        # ensure gene expression values are numeric
+        data <- ensure_numeric_gex(data)
+  	
 	# Convert the numeric part of the data.table to a matrix.
 	# Assuming first column contains gene symbols.
 	datamat = data.matrix(data[,2:ncol(data),with=F])
@@ -116,10 +119,10 @@ inv_log_transform = function(data = NULL, file = NULL) {
 	inv_log = apply(datamat,1,inv_log)
 	
 	# Convert the result back to a data.table and bind the symbols back on.
-	result = data.table(cbind(data[[1]], t(inv_log)))
+	result = data.table(cbind(as.character(data[[1]]), t(inv_log)))
 	setnames(result, colnames(result), colnames(data))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 } # end inv_log_transform
 
 #' Log2 Transform 1 Plus
@@ -144,6 +147,9 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 		}
 	} 
 	
+        # ensure gene expression values are numeric
+        data <- ensure_numeric_gex(data)
+  
 	# Convert the numeric part of the data.table to a matrix.
 	# Assuming first column contains gene symbols.
 	datamat = data.matrix(data[,2:ncol(data),with=F])
@@ -156,7 +162,7 @@ log_transform_p1 = function(data = NULL, file = NULL) {
 	result = data.table(cbind(as.character(data[[1]]), t(log_transform)))
 	setnames(result, colnames(result), colnames(data))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 } # end log_transform_p1
 
 #' Zero to One Transform a Vector
@@ -199,6 +205,10 @@ zero_to_one = function(data) {
 #' 
 #' @export
 zero_to_one_transform = function(datatable) {
+  
+        # ensure gene expression values are numeric
+        datatable <- ensure_numeric_gex(datatable)
+  
 	# Convert the data to a matrix.
 	datamat = data.matrix(datatable[,2:ncol(datatable),with=F])
 	
@@ -206,10 +216,10 @@ zero_to_one_transform = function(datatable) {
 	zo = apply(datamat,1,zero_to_one)
 	
 	# Bind on the gene symbols.
-	result = data.table(data.frame(datatable[[1]], t(zo)))
+	result = data.table(data.frame(as.character(datatable[[1]]), t(zo)))
 	setnames(result, colnames(result), colnames(datatable))
 	
-	return(result)
+	return(ensure_numeric_gex(result))
 }
 
 #' TDM Transformation on a Single Value
@@ -364,7 +374,7 @@ tdm_transform <- function(target_data=NULL,
 		ref_values = ref_data
 	}
 
-    # Get the gene symbols from the reference data.
+        # Get the gene symbols from the reference data.
 	genes = data.frame(gene = ref_values[[1]], drop=F)
 	
 	# Inverse log, then relog reference values if asked.
@@ -481,6 +491,43 @@ tdm_transform <- function(target_data=NULL,
 	# the reference file.
 	expression_values <- expression_values[match(genes$gene, expression_values$gene),1:ncol(expression_values),with=FALSE]
 
+	# ensure gene expression values are numeric
+	expression_values <- ensure_numeric_gex(expression_values)
+	
 	return(expression_values)
 } # end tdm_transform
 
+#' Numeric version of data.table
+#' 
+#' Ensure gene expression values are numeric in a given data.table
+#' 
+#' @param input_data: a data.table with gene in the first column and gene 
+#' expression in the remaining columns
+#' 
+#' @return a data.table with numeric values for the gene expression columns
+#'
+#' @export
+ensure_numeric_gex <- function(input_data) {
+  
+  if ("data.table" %in% class(input_data)) {
+    
+    # save gene names as character vector
+    gene_names <- as.character(input_data[[1]])
+    
+    # force gene expression values to be numeric
+    gex_values <- t(apply(input_data[,-1], 1, as.numeric))
+    
+    # create data frame of gene names and gene expression values
+    # set column names to be same as input data
+    return_df <- data.frame(gene_names, gex_values)
+    names(return_df) <- names(input_data)
+    
+    # return as data.table
+    return(data.table(return_df))
+    
+  } else {
+
+    stop("\nInput must be a data.table")
+    
+  }
+} # ensure_numeric_gex
