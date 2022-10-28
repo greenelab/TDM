@@ -30,7 +30,7 @@ This research is funded in part by the Gordon and Betty Moore Foundation’s Dat
 
 *Unfortunately, this is unlikely to work well. We assumed raw or RSEM counts with the TDM approach.*
 
-**Can I used TDM to normalize array data to match RNA-seq data?**
+**Can I use TDM to normalize array data to match RNA-seq data?**
 
 *We generally do not advise this study design. We expect array data to have less precision at higher expression levels due to saturation, while counts-based RNA-seq data does not have that problem. We recommend reshaping the broader, more precise data (RNA-seq) to fit the narrower and less precise (array) distribution.*
 
