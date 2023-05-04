@@ -29,3 +29,8 @@ This research is funded in part by the Gordon and Betty Moore Foundation’s Dat
 **Can I use TPM corrected values with TDM?**
 
 *Unfortunately, this is unlikely to work well. We assumed raw or RSEM counts with the TDM approach.*
+
+**Can I use TDM to normalize array data to match RNA-seq data?**
+
+*We generally do not advise this study design. We expect array data to have less precision at higher expression levels due to saturation, while counts-based RNA-seq data does not have that problem. We recommend reshaping the data expected to have more dynamic range (RNA-seq) to fit the narrower and less precise (array) distribution.*
+
